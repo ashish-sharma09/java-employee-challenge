@@ -8,6 +8,7 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+def restVersion = '5.3.2'
 
 repositories {
     mavenCentral()
@@ -16,14 +17,18 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'javax.inject:javax.inject:1'
+    implementation 'org.projectlombok:lombok:1.18.20'
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation(group: 'io.rest-assured', name: 'rest-assured', version: '5.3.2') {
+    testImplementation("io.rest-assured:rest-assured:${restVersion}") {
         exclude group: 'org.codehaus.groovy', module: 'groovy'
         exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
     }
+    testImplementation "io.rest-assured:json-path:${restVersion}"
+    testImplementation "io.rest-assured:xml-path:${restVersion}"
+
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8', version: '2.32.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
