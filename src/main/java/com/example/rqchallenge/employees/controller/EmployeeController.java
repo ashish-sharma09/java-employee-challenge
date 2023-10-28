@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -23,12 +24,16 @@ public class EmployeeController implements IEmployeeController {
 
     @Override
     public ResponseEntity<List<Employee>> getAllEmployees() {
-        return ResponseEntity.ok(employeeService.getAllEmployees());
+        return ResponseEntity.ok(allEmployees());
     }
 
     @Override
-    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
-        return null;
+    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchName) {
+        var employeesMatchingSearchName = allEmployees().stream()
+                .filter(employee -> employee.getName().contains(searchName))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(employeesMatchingSearchName);
     }
 
     @Override
@@ -54,5 +59,9 @@ public class EmployeeController implements IEmployeeController {
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
         return null;
+    }
+
+    private List<Employee> allEmployees() {
+        return employeeService.getAllEmployees();
     }
 }

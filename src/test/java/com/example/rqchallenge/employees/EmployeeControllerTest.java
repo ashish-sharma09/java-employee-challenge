@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeControllerTest {
@@ -34,11 +35,21 @@ class EmployeeControllerTest {
                 new Employee("2", "someEmployee2Name", 223600, "41", new byte[]{})
         );
 
-        Mockito.when(employeeService.getAllEmployees()).thenReturn(expectedEmployeeList);
+        when(employeeService.getAllEmployees()).thenReturn(expectedEmployeeList);
 
         assertThat(employeeController.getAllEmployees().getBody()).isEqualTo(expectedEmployeeList);
     }
 
+    @Test
+    void getEmployeesByNameSearchMatchingAnEmployee() {
+        var matchingEmployee = new Employee("1", "someFirstName1 someLastName1", 320800, "61", new byte[]{});
+        List<Employee> expectedEmployeeList = List.of (
+                matchingEmployee,
+                new Employee("2", "someFirstName2 someLastName2", 223600, "41", new byte[]{})
+        );
 
+        when(employeeService.getAllEmployees()).thenReturn(expectedEmployeeList);
 
+        assertThat(employeeController.getEmployeesByNameSearch("someFirstName1").getBody()).containsExactly(matchingEmployee);
+    }
 }
