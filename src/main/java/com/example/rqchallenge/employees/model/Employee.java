@@ -6,6 +6,7 @@ import lombok.Data;
 public class Employee {
     private final String id;
     private final String name;
+    private final int salary;
     private final String age;
     private final byte[] image;
 }
