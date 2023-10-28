@@ -106,7 +106,7 @@ class RqChallengeApplicationTests {
     void getEmployeeById() throws IOException, JSONException {
         givenGetAllEmployeesStubbedBehaviour();
         var actualResponse = when().get("/2").then().statusCode(200).extract().body().asPrettyString();
-        JSONAssert.assertEquals(ResponseUtils.ID_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
+        JSONAssert.assertEquals(ResponseUtils.EMPLOYEE_2, actualResponse, JSONCompareMode.STRICT);
     }
 
     private String contentOf(String resourceName) throws IOException {

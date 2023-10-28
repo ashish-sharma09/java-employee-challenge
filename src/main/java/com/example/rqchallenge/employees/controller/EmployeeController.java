@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,16 +30,19 @@ public class EmployeeController implements IEmployeeController {
 
     @Override
     public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
-        var employeesMatchingSearchName = allEmployees().stream()
-                .filter(employee -> employee.getName().toLowerCase().contains(searchString.toLowerCase()))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(employeesMatchingSearchName);
+        return ResponseEntity.ok(findEmployeesByFilter(
+                employee -> employee.getName().toLowerCase().contains(searchString.toLowerCase())));
     }
 
     @Override
     public ResponseEntity<Employee> getEmployeeById(String id) {
-        return null;
+        List<Employee> employeeByFilter = findEmployeesByFilter(employee -> employee.getId().equals(id));
+
+        if (employeeByFilter.size() > 1) {
+            log.error("Multiple employees found with id: {}", id);
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.ok(employeeByFilter.get(0));
     }
 
     @Override
@@ -59,6 +63,12 @@ public class EmployeeController implements IEmployeeController {
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
         return null;
+    }
+
+    private List<Employee> findEmployeesByFilter(Predicate<Employee> employeePredicate) {
+        return allEmployees().stream()
+                .filter(employeePredicate)
+                .collect(Collectors.toList());
     }
 
     private List<Employee> allEmployees() {

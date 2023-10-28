@@ -21,8 +21,6 @@ public interface ResponseUtils {
 
     String NAME_SEARCH_EMPLOYEE_RESPONSE = "[" + EMPLOYEE_1 + "]";
 
-    String ID_SEARCH_EMPLOYEE_RESPONSE = "[" + EMPLOYEE_2 + "]";
-
     String NAME_SEARCH_MULTIPLE_EMPLOYEE_RESPONSE = "[" + EMPLOYEE_1 + "," + EMPLOYEE_2 + "]";
 
 
