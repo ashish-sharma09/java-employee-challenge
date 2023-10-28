@@ -88,4 +88,17 @@ class EmployeeControllerTest {
         assertThat(employeeController.getEmployeeById("1").getStatusCodeValue()).isEqualTo(500);
     }
 
+    @Test
+    void getHighestSalaryOfEmployees() {
+        // Given
+        int expectedResponse = 320800;
+        var matchingEmployee = new Employee("1", "someFirstName1 someLastName1", expectedResponse, "61", new byte[]{});
+        var nonMatchingEmployee = new Employee("2", "someFirstName2 someLastName2", 223600, "41", new byte[]{});
+
+        when(employeeService.getAllEmployees()).thenReturn(List.of(matchingEmployee,nonMatchingEmployee));
+
+        // Then
+        assertThat(employeeController.getHighestSalaryOfEmployees().getBody()).isEqualTo(expectedResponse);
+    }
+
 }

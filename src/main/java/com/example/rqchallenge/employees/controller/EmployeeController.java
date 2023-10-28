@@ -4,13 +4,20 @@ import com.example.rqchallenge.employees.model.Employee;
 import com.example.rqchallenge.employees.service.IEmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparingInt;
 
 @Slf4j
 @RestController
@@ -47,7 +54,12 @@ public class EmployeeController implements IEmployeeController {
 
     @Override
     public ResponseEntity<Integer> getHighestSalaryOfEmployees() {
-        return null;
+        var employees = allEmployees()
+                .stream()
+                .sorted(comparingInt(Employee::getSalary))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(employees.get(employees.size()-1).getSalary());
     }
 
     @Override

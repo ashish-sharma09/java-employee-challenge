@@ -28,6 +28,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class) // TODO check if we need this
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -107,6 +108,20 @@ class RqChallengeApplicationTests {
         givenGetAllEmployeesStubbedBehaviour();
         var actualResponse = when().get("/2").then().statusCode(200).extract().body().asPrettyString();
         JSONAssert.assertEquals(ResponseUtils.EMPLOYEE_2, actualResponse, JSONCompareMode.STRICT);
+    }
+
+    @Test
+    void getHighestSalaryOfEmployees() throws IOException, JSONException {
+        givenGetAllEmployeesStubbedBehaviour();
+        String body = when().get("/highestSalary")
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .and()
+                .extract()
+                .body()
+                .asString();
+        assertThat(body).isEqualTo("365000");
     }
 
     private String contentOf(String resourceName) throws IOException {
