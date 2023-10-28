@@ -95,6 +95,13 @@ class RqChallengeApplicationTests {
         JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
     }
 
+    @Test
+    void getEmployeeByNameSearchMatchingMultipleEmployees() throws IOException, JSONException {
+        givenGetAllEmployeesStubbedBehaviour();
+        var actualResponse = when().get("/search/ixon").then().statusCode(200).extract().body().asPrettyString();
+        JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_MULTIPLE_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
+    }
+
     private String contentOf(String resourceName) throws IOException {
         return new String(Files.readAllBytes(Paths.get(resourceURI(resourceName))));
     }
