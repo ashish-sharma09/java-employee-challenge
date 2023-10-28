@@ -1,5 +1,6 @@
 package com.example.rqchallenge.employees;
 
+import com.example.rqchallenge.employees.controller.EmployeeController;
 import com.example.rqchallenge.employees.model.Employee;
 import com.example.rqchallenge.employees.service.IEmployeeService;
 import org.junit.jupiter.api.BeforeEach;

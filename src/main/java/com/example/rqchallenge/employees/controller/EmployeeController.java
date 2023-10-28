@@ -1,4 +1,4 @@
-package com.example.rqchallenge.employees;
+package com.example.rqchallenge.employees.controller;
 
 import com.example.rqchallenge.employees.model.Employee;
 import com.example.rqchallenge.employees.service.IEmployeeService;
