@@ -1,5 +1,6 @@
 package com.example.rqchallenge;
 
+import com.example.rqchallenge.employees.utils.ResponseUtils;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.restassured.RestAssured;
@@ -73,12 +74,18 @@ class RqChallengeApplicationTests {
 
     @Test
     void getAllEmployees() throws IOException, JSONException {
-        var employeesJson = contentOf("allEmployeesFromDummyService.json");
-        stubDummyServiceBehaviourWith("/employees", employeesJson);
+        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesFromDummyService.json"));
         var expectedResponse = contentOf("expectedAllEmployees.json");
         var actualResponse = when().get("/").then().statusCode(200).extract().body().asPrettyString();
 
         JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
+    }
+
+    @Test
+    void getEmployeeByNameSearchWithFirstNameToMatch() throws IOException, JSONException {
+        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesFromDummyService.json"));
+        var actualResponse = when().get("/search/Tiger").then().statusCode(200).extract().body().asPrettyString();
+        JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
     }
 
     private String contentOf(String resourceName) throws IOException {
