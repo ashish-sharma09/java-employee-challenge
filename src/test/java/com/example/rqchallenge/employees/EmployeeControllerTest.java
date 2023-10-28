@@ -1,8 +1,7 @@
 package com.example.rqchallenge.employees;
 
 import com.example.rqchallenge.employees.model.Employee;
-import com.example.rqchallenge.employees.service.EmployeeService;
-import org.hamcrest.Matchers;
+import com.example.rqchallenge.employees.service.IEmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EmployeeControllerTest {
 
     @Mock
-    EmployeeService employeeService;
+    IEmployeeService employeeService;
 
     private EmployeeController employeeController;
 

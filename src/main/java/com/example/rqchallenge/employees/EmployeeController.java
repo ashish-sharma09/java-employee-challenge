@@ -1,7 +1,7 @@
 package com.example.rqchallenge.employees;
 
 import com.example.rqchallenge.employees.model.Employee;
-import com.example.rqchallenge.employees.service.EmployeeService;
+import com.example.rqchallenge.employees.service.IEmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +14,10 @@ import java.util.Map;
 @RestController
 public class EmployeeController implements IEmployeeController {
 
-    private final EmployeeService employeeService;
+    private final IEmployeeService employeeService;
 
     @Autowired
-    public EmployeeController(EmployeeService employeeService) {
+    public EmployeeController(IEmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
