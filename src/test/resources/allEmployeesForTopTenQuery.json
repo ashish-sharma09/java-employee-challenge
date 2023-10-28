@@ -1,0 +1,110 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": "1",
+      "employee_name": "Tiger Nixon",
+      "employee_salary": "320800",
+      "employee_age": "61",
+      "profile_image": ""
+    },
+    {
+      "id": "2",
+      "employee_name": "Charles Dixon",
+      "employee_salary": "264500",
+      "employee_age": "44",
+      "profile_image": ""
+    },
+    {
+      "id": "3",
+      "employee_name": "Mark Barrymore",
+      "employee_salary": "365000",
+      "employee_age": "51",
+      "profile_image": ""
+    },
+    {
+      "id": "4",
+      "employee_name": "Ashok Kumar",
+      "employee_salary": "420720",
+      "employee_age": "61",
+      "profile_image": ""
+    },
+    {
+      "id": "5",
+      "employee_name": "Jiya Sharma",
+      "employee_salary": "324500",
+      "employee_age": "44",
+      "profile_image": ""
+    },
+    {
+      "id": "6",
+      "employee_name": "Harrison Daley",
+      "employee_salary": "245000",
+      "employee_age": "51",
+      "profile_image": ""
+    },
+    {
+      "id": "7",
+      "employee_name": "Arnold Grey",
+      "employee_salary": "580400",
+      "employee_age": "65",
+      "profile_image": ""
+    },
+    {
+      "id": "8",
+      "employee_name": "Jamie White",
+      "employee_salary": "314700",
+      "employee_age": "39",
+      "profile_image": ""
+    },
+    {
+      "id": "9",
+      "employee_name": "Upen Patel",
+      "employee_salary": "358900",
+      "employee_age": "43",
+      "profile_image": ""
+    },
+    {
+      "id": "10",
+      "employee_name": "Bruce Eliott",
+      "employee_salary": "445800",
+      "employee_age": "55",
+      "profile_image": ""
+    },
+    {
+      "id": "11",
+      "employee_name": "Dom White",
+      "employee_salary": "233900",
+      "employee_age": "34",
+      "profile_image": ""
+    },
+    {
+      "id": "12",
+      "employee_name": "Sam Canagella",
+      "employee_salary": "433900",
+      "employee_age": "52",
+      "profile_image": ""
+    },
+    {
+      "id": "13",
+      "employee_name": "Michael Willis",
+      "employee_salary": "120800",
+      "employee_age": "29",
+      "profile_image": ""
+    },
+    {
+      "id": "14",
+      "employee_name": "Dimitrije Rose",
+      "employee_salary": "569900",
+      "employee_age": "48",
+      "profile_image": ""
+    },
+    {
+      "id": "15",
+      "employee_name": "Lincoln Drew",
+      "employee_salary": "388900",
+      "employee_age": "57",
+      "profile_image": ""
+    }
+  ]
+}

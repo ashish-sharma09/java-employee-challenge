@@ -24,6 +24,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static com.example.rqchallenge.employees.utils.ResourceTestUtils.contentOf;
+import static com.example.rqchallenge.employees.utils.ResourceTestUtils.resourcePath;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.restassured.RestAssured.given;
@@ -124,8 +126,19 @@ class RqChallengeApplicationTests {
         assertThat(body).isEqualTo("365000");
     }
 
-    private String contentOf(String resourceName) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(resourceURI(resourceName))));
+    @Test
+    void getTop10HighestEarningEmployeeNames() throws IOException, JSONException {
+        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesForTopTenQuery.json"));
+        String actualResponse = when().get("/topTenHighestEarningEmployeeNames")
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .and()
+                .extract()
+                .body()
+                .asPrettyString();
+        var expectedResponse = contentOf("expectedAllEmployeesForTopTen.json");
+        JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
     }
 
     private void stubDummyServiceBehaviourWith(String url, String responseBody) {
@@ -133,18 +146,6 @@ class RqChallengeApplicationTests {
                 WireMock.get(url)
                         .willReturn(aResponse().withBody(responseBody).withHeader("content-type", "application/json"))
         );
-    }
-
-    private static String resourcePath(String resourceName) {
-        return resourceURI(resourceName).getPath();
-    }
-
-    private static URI resourceURI(String resourceName) {
-        try {
-            return RqChallengeApplicationTests.class.getClassLoader().getResource(resourceName).toURI();
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("Could not find given resource: " + resourceName);
-        }
     }
 
     private void givenGetAllEmployeesStubbedBehaviour() throws IOException {
