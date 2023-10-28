@@ -74,7 +74,7 @@ class RqChallengeApplicationTests {
 
     @Test
     void getAllEmployees() throws IOException, JSONException {
-        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesFromDummyService.json"));
+        givenGetAllEmployeesStubbedBehaviour();
         var expectedResponse = contentOf("expectedAllEmployees.json");
         var actualResponse = when().get("/").then().statusCode(200).extract().body().asPrettyString();
 
@@ -83,8 +83,15 @@ class RqChallengeApplicationTests {
 
     @Test
     void getEmployeeByNameSearchWithFirstNameToMatch() throws IOException, JSONException {
-        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesFromDummyService.json"));
+        givenGetAllEmployeesStubbedBehaviour();
         var actualResponse = when().get("/search/Tiger").then().statusCode(200).extract().body().asPrettyString();
+        JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
+    }
+
+    @Test
+    void getEmployeeByNameSearchWithMatchingPartialNameIgnoringCase() throws IOException, JSONException {
+        givenGetAllEmployeesStubbedBehaviour();
+        var actualResponse = when().get("/search/tiger").then().statusCode(200).extract().body().asPrettyString();
         JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
     }
 
@@ -109,5 +116,9 @@ class RqChallengeApplicationTests {
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Could not find given resource: " + resourceName);
         }
+    }
+
+    private void givenGetAllEmployeesStubbedBehaviour() throws IOException {
+        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesFromDummyService.json"));
     }
 }

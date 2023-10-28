@@ -28,9 +28,9 @@ public class EmployeeController implements IEmployeeController {
     }
 
     @Override
-    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchName) {
+    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
         var employeesMatchingSearchName = allEmployees().stream()
-                .filter(employee -> employee.getName().contains(searchName))
+                .filter(employee -> employee.getName().toLowerCase().contains(searchString.toLowerCase()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(employeesMatchingSearchName);
