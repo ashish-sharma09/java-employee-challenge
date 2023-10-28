@@ -4,12 +4,17 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
@@ -31,10 +36,15 @@ class RqChallengeApplicationTests {
     static WireMockExtension wireMockServer = WireMockExtension.newInstance()
             .options(wireMockConfig()
                     .dynamicHttpsPort()
-                    .keystorePath(resourcePath("dummyservice.jks"))
+                    .keystorePath(resourcePath("dummyKeystore.jks"))
                     .keystorePassword("changeit") // TODO pick from config file
                     .keyManagerPassword("changeit"))
             .build();
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("employee.backend.service.uri", wireMockServer::baseUrl);
+    }
 
     @LocalServerPort
     private int port;
@@ -45,22 +55,16 @@ class RqChallengeApplicationTests {
     }
 
     @Test
-    void contextLoads() { // TODO remove this later
-    }
+    void dummyServiceTLSConfiguration() {
 
-    @Test
-    void checkDummyServiceTLSConfiguration() {
-
-        String status = "        {" +
-                "            \"status\": \"success\"" +
-                "        }";
+        String status = "{\"status\": \"success\"}";
 
         stubDummyServiceBehaviourWith("/status", status);
 
         RestAssured.baseURI = "https://localhost:" + wireMockServer.getHttpsPort();
 
         given()
-                .trustStore(resourcePath("dummyservice.jks"), "changeit") // TODO pick from config file
+                .trustStore(resourcePath("dummyKeystore.jks"), "changeit") // TODO pick from config file
                 .when()
                 .get("/status")
                 .then()
@@ -68,20 +72,23 @@ class RqChallengeApplicationTests {
     }
 
     @Test
-    void getAllEmployees() throws IOException {
-        String employeesJson =
-                new String(
-                        Files.readAllBytes(Paths.get(resourceURI("allEmployeesFromDummyService.json")))
-                );
+    void getAllEmployees() throws IOException, JSONException {
+        var employeesJson = contentOf("allEmployeesFromDummyService.json");
         stubDummyServiceBehaviourWith("/employees", employeesJson);
+        var expectedResponse = contentOf("expectedAllEmployees.json");
+        var actualResponse = when().get("/").then().statusCode(200).extract().body().asPrettyString();
 
-        when().get("/").then().body(Matchers.is(employeesJson));
+        JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
+    }
+
+    private String contentOf(String resourceName) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(resourceURI(resourceName))));
     }
 
     private void stubDummyServiceBehaviourWith(String url, String responseBody) {
         wireMockServer.stubFor(
                 WireMock.get(url)
-                        .willReturn(aResponse().withBody(responseBody))
+                        .willReturn(aResponse().withBody(responseBody).withHeader("content-type", "application/json"))
         );
     }
 
@@ -96,6 +103,4 @@ class RqChallengeApplicationTests {
             throw new IllegalStateException("Could not find given resource: " + resourceName);
         }
     }
-
-
 }

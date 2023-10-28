@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "name": "Tiger Nixon",
+    "salary": 320800,
+    "age": "61",
+    "image": ""
+  },
+  {
+    "id": "2",
+    "name": "Charles Dixon",
+    "salary": 264500,
+    "age": "44",
+    "image": ""
+  },
+  {
+    "id": "3",
+    "name": "Mark Barrymore",
+    "salary": 365000,
+    "age": "51",
+    "image": ""
+  }
+]
