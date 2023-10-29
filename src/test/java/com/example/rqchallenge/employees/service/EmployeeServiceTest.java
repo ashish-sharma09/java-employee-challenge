@@ -2,7 +2,8 @@ package com.example.rqchallenge.employees.service;
 
 import com.example.rqchallenge.employees.model.Employee;
 import com.example.rqchallenge.employees.service.model.EmployeeData;
-import com.example.rqchallenge.employees.service.model.Response;
+import com.example.rqchallenge.employees.service.model.ResponseForEmployee;
+import com.example.rqchallenge.employees.service.model.ResponseForEmployees;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,11 +29,11 @@ class EmployeeServiceTest {
     void setUp() {
         employeeService = new EmployeeService(restTemplate);
     }
-
+    //TODO change url to include /api/v1
     @Test
     void getAllEmployees() {
-        Response response = getResponse();
-        Mockito.when(restTemplate.getForObject("/employees", Response.class)).thenReturn(response);
+        ResponseForEmployees response = getResponse();
+        Mockito.when(restTemplate.getForObject("/employees", ResponseForEmployees.class)).thenReturn(response);
 
         var expectedEmployees = response.getData().stream().map(employeeData ->
                         new Employee(
@@ -47,15 +48,26 @@ class EmployeeServiceTest {
         assertThat(employeeService.getAllEmployees()).containsAll(expectedEmployees);
     }
 
-    private Response getResponse() {
-        Response response = new Response();
-        response.setStatus("success");
-        var employeeData1 = new EmployeeData();
-        employeeData1.setId("1");
-        employeeData1.setName("Tiger Nixon");
-        employeeData1.setSalary("320800");
-        employeeData1.setAge("61");
-        employeeData1.setImage("".getBytes());
+    @Test
+    void getEmployeeById() {
+        ResponseForEmployee response = new ResponseForEmployee();
+        EmployeeData employeeData = employee1Data();
+        response.setData(employeeData);
+        Mockito.when(restTemplate.getForObject("/employee/1", ResponseForEmployee.class)).thenReturn(response);
+
+        var expectedEmployee = new Employee(
+                                employeeData.getId(),
+                                employeeData.getName(),
+                                Integer.parseInt(employeeData.getSalary()),
+                                employeeData.getAge(),
+                                employeeData.getImage());
+
+        assertThat(employeeService.getEmployeeById("1")).isEqualTo(expectedEmployee);
+    }
+
+    private ResponseForEmployees getResponse() {
+        ResponseForEmployees response = new ResponseForEmployees();
+        EmployeeData employeeData1 = employee1Data();
 
         var employeeData2 = new EmployeeData();
         employeeData2.setId("2");
@@ -66,5 +78,15 @@ class EmployeeServiceTest {
 
         response.setData(List.of(employeeData1, employeeData2));
         return response;
+    }
+
+    private EmployeeData employee1Data() {
+        var employeeData1 = new EmployeeData();
+        employeeData1.setId("1");
+        employeeData1.setName("Tiger Nixon");
+        employeeData1.setSalary("320800");
+        employeeData1.setAge("61");
+        employeeData1.setImage("".getBytes());
+        return employeeData1;
     }
 }

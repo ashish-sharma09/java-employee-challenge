@@ -5,7 +5,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Response {
-    private String status;
+public class ResponseForEmployees {
     private List<EmployeeData> data;
 }

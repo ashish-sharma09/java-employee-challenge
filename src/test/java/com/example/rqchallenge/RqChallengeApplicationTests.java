@@ -19,10 +19,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static com.example.rqchallenge.employees.utils.ResourceTestUtils.contentOf;
 import static com.example.rqchallenge.employees.utils.ResourceTestUtils.resourcePath;
@@ -47,7 +43,7 @@ class RqChallengeApplicationTests {
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("employee.backend.service.uri", wireMockServer::baseUrl);
+        registry.add("employee.backend.service.uri", () -> wireMockServer.baseUrl() + "/api/v1");
     }
 
     @LocalServerPort
@@ -106,8 +102,8 @@ class RqChallengeApplicationTests {
     }
 
     @Test
-    void getEmployeeById() throws IOException, JSONException {
-        givenGetAllEmployeesStubbedBehaviour();
+    void getEmployeeById() throws JSONException {
+        stubDummyServiceBehaviourWith("/api/v1/employee/2", ResponseUtils.GET_EMPLOYEE_BY_ID_RESPONSE);
         var actualResponse = when().get("/2").then().statusCode(200).extract().body().asPrettyString();
         JSONAssert.assertEquals(ResponseUtils.EMPLOYEE_2, actualResponse, JSONCompareMode.STRICT);
     }
@@ -128,7 +124,7 @@ class RqChallengeApplicationTests {
 
     @Test
     void getTop10HighestEarningEmployeeNames() throws IOException, JSONException {
-        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesForTopTenQuery.json"));
+        stubDummyServiceBehaviourWith("/api/v1/employees", contentOf("allEmployeesForTopTenQuery.json"));
         String actualResponse = when().get("/topTenHighestEarningEmployeeNames")
                 .then()
                 .assertThat()
@@ -149,6 +145,6 @@ class RqChallengeApplicationTests {
     }
 
     private void givenGetAllEmployeesStubbedBehaviour() throws IOException {
-        stubDummyServiceBehaviourWith("/employees", contentOf("allEmployeesFromDummyService.json"));
+        stubDummyServiceBehaviourWith("/api/v1/employees", contentOf("allEmployeesFromDummyService.json"));
     }
 }

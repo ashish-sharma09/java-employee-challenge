@@ -23,7 +23,16 @@ public interface ResponseUtils {
 
     String NAME_SEARCH_MULTIPLE_EMPLOYEE_RESPONSE = "[" + EMPLOYEE_1 + "," + EMPLOYEE_2 + "]";
 
-
+    String GET_EMPLOYEE_BY_ID_RESPONSE = "{" +
+            " \"status\": \"success\"," +
+            " \"data\": {" +
+            "      \"id\": \"2\"," +
+            "      \"employee_name\": \"Charles Dixon\"," +
+            "      \"employee_salary\": \"264500\"," +
+            "      \"employee_age\": \"44\"," +
+            "      \"profile_image\": \"\"" +
+            "  }" +
+            "}";
 
 
 

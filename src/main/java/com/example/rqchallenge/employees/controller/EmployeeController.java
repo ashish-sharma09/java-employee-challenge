@@ -37,13 +37,7 @@ public class EmployeeController implements IEmployeeController {
 
     @Override
     public ResponseEntity<Employee> getEmployeeById(String id) {
-        List<Employee> employeeByFilter = findEmployeesByFilter(employee -> employee.getId().equals(id));
-
-        if (employeeByFilter.size() > 1) {
-            log.error("Multiple employees found with id: {}", id);
-            return ResponseEntity.internalServerError().build();
-        }
-        return ResponseEntity.ok(employeeByFilter.get(0));
+        return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
     @Override

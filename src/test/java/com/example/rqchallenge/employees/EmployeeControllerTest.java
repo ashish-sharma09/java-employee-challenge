@@ -67,13 +67,12 @@ class EmployeeControllerTest {
     @Test
     void getEmployeesByIdSearch() {
         // Given
-        var nonMatchingEmployee = new Employee("1", "someFirstName1 someLastName1", 320800, "61", new byte[]{});
-        var matchingEmployee = new Employee("2", "someFirstName2 someLastName2", 223600, "41", new byte[]{});
+        var employee = new Employee("2", "someFirstName2 someLastName2", 223600, "41", new byte[]{});
 
-        when(employeeService.getAllEmployees()).thenReturn(List.of(matchingEmployee,nonMatchingEmployee));
+        when(employeeService.getEmployeeById("2")).thenReturn(employee);
 
         // Then
-        assertThat(employeeController.getEmployeeById("2").getBody()).isEqualTo(matchingEmployee);
+        assertThat(employeeController.getEmployeeById("2").getBody()).isEqualTo(employee);
     }
 
     @Test
