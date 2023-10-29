@@ -58,7 +58,11 @@ public class EmployeeController implements IEmployeeController {
                 .map(Employee::getName)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(sortedEmployees.subList(0, 10));
+        if (sortedEmployees.size() > 10) {
+            return ResponseEntity.ok(sortedEmployees.subList(0, 10));
+        } else {
+            return ResponseEntity.ok(sortedEmployees);
+        }
     }
 
     @Override

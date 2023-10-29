@@ -146,4 +146,31 @@ class EmployeeControllerTest {
 
         assertThat(employeeController.getTopTenHighestEarningEmployeeNames().getBody()).isEqualTo(expectedResponse);
     }
+
+    @Test
+    void getAllEmployeeNamesWhenTotalEmployeesAreLessThan10() {
+        // Given
+        var employee4 = new Employee("4", "Employee4", 4000, "41", new byte[]{});
+        var employee2 = new Employee("2", "Employee2", 2000, "41", new byte[]{});
+        var employee6 = new Employee("8", "Employee8", 8000, "41", new byte[]{});
+        var employee3 = new Employee("3", "Employee3", 3000, "41", new byte[]{});
+        var employee1 = new Employee("1", "Employee1", 1000, "61", new byte[]{});
+        var employee5 = new Employee("5", "Employee5", 5000, "41", new byte[]{});
+
+        when(employeeService.getAllEmployees()).thenReturn(
+                List.of(
+                        employee4,
+                        employee2,
+                        employee3,
+                        employee1,
+                        employee5,
+                        employee6
+                )
+        );
+
+        // Then
+        var expectedResponse = List.of("Employee8","Employee5","Employee4","Employee3","Employee2", "Employee1");
+
+        assertThat(employeeController.getTopTenHighestEarningEmployeeNames().getBody()).isEqualTo(expectedResponse);
+    }
 }
