@@ -1,7 +1,6 @@
 package com.example.rqchallenge;
 
 import com.example.rqchallenge.employees.utils.ResponseUtils;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
@@ -28,6 +27,7 @@ import static com.example.rqchallenge.employees.utils.ResponseUtils.DELETE_EMPLO
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -89,10 +89,22 @@ class RqChallengeApplicationTests {
     }
 
     @Test
+    void errorDuringGetAllEmployees() throws IOException, JSONException {
+        stubDummyServiceGetBehaviourWith("/", 500);
+        when().get("/").then().statusCode(500);
+    }
+
+    @Test
     void getEmployeeByNameSearchWithFirstNameToMatch() throws IOException, JSONException {
         givenGetAllEmployeesStubbedBehaviour();
         var actualResponse = when().get("/search/Tiger").then().statusCode(200).extract().body().asPrettyString();
         assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
+    }
+
+    @Test
+    void noEmployeeFoundByNameSearch() throws IOException {
+        givenGetAllEmployeesStubbedBehaviour();
+        when().get("/search/notExistingName").then().statusCode(404);
     }
 
     @Test
@@ -217,9 +229,13 @@ class RqChallengeApplicationTests {
 
     private void stubDummyServiceGetBehaviourWith(String url, String responseBody) {
         wireMockServer.stubFor(
-                WireMock.get(url)
+                get(url)
                         .willReturn(aResponse().withBody(responseBody).withHeader("content-type", "application/json"))
         );
+    }
+
+    private void stubDummyServiceGetBehaviourWith(String url, int statusCode) {
+        wireMockServer.stubFor(get(url).willReturn(aResponse().withStatus(statusCode)));
     }
 
     private void givenGetAllEmployeesStubbedBehaviour() throws IOException {

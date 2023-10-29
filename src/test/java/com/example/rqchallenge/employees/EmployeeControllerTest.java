@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -65,6 +66,18 @@ class EmployeeControllerTest {
 
         // Then
         assertThat(employeeController.getEmployeesByNameSearch("somefirstname1").getBody()).containsExactly(matchingEmployee);
+    }
+
+    @Test
+    void getEmployeesByNameSearchDoesNotMatchAnyEmployee() {
+        // Given
+        var nonMatchingEmployee = new Employee("2", "someFirstName2 someLastName2", 223600, "41", new byte[]{});
+
+        when(employeeService.getAllEmployees()).thenReturn(List.of(nonMatchingEmployee));
+
+        // Then
+        assertThat(employeeController.getEmployeesByNameSearch("someNonMatchingName").getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test

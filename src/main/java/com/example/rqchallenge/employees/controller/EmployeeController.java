@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -31,8 +32,15 @@ public class EmployeeController implements IEmployeeController {
 
     @Override
     public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
-        return ResponseEntity.ok(findEmployeesByFilter(
-                employee -> employee.getName().toLowerCase().contains(searchString.toLowerCase())));
+        var filteredEmployees = findEmployeesByFilter(
+                employee -> employee.getName().toLowerCase().contains(searchString.toLowerCase()));
+
+        if (!filteredEmployees.isEmpty()) {
+            return ResponseEntity.ok(filteredEmployees);
+        } else {
+            log.info("No Employees found with name: {}", searchString);
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Override
@@ -88,6 +96,12 @@ public class EmployeeController implements IEmployeeController {
     }
 
     private List<Employee> allEmployees() {
-        return employeeService.getAllEmployees();
+        var allEmployees = employeeService.getAllEmployees();
+
+        if (allEmployees != null) {
+            return allEmployees;
+        } else {
+            return Collections.emptyList();
+        }
     }
 }
