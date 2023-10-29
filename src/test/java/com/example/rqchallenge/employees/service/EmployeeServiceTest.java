@@ -1,6 +1,8 @@
 package com.example.rqchallenge.employees.service;
 
 import com.example.rqchallenge.employees.model.Employee;
+import com.example.rqchallenge.employees.service.exception.EmployeeServiceException;
+import com.example.rqchallenge.employees.service.exception.EmployeeServiceNotFoundException;
 import com.example.rqchallenge.employees.service.model.EmployeeData;
 import com.example.rqchallenge.employees.service.model.ResponseForDelete;
 import com.example.rqchallenge.employees.service.model.ResponseForEmployee;
@@ -14,16 +16,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
@@ -71,6 +76,22 @@ class EmployeeServiceTest {
                                 employeeData.getImage());
 
         assertThat(employeeService.getEmployeeById("1")).isEqualTo(expectedEmployee);
+    }
+
+    @Test
+    void getEmployeeByIdNotFound() {
+        Mockito.when(restTemplate.getForObject("/employee/1", ResponseForEmployee.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        assertThrows(EmployeeServiceNotFoundException.class, () -> employeeService.getEmployeeById("1"));
+    }
+
+    @Test
+    void getEmployeeByIdInternalServerError() {
+        Mockito.when(restTemplate.getForObject("/employee/1", ResponseForEmployee.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        assertThrows(EmployeeServiceException.class, () -> employeeService.getEmployeeById("1"));
     }
 
     @Test

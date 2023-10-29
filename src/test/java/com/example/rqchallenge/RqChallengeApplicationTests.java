@@ -129,7 +129,13 @@ class RqChallengeApplicationTests {
     }
 
     @Test
-    void getHighestSalaryOfEmployees() throws IOException, JSONException {
+    void noEmployeeFoundById() {
+        stubDummyServiceGetBehaviourWith("/api/v1/employee/99", 404);
+        when().get("/99").then().statusCode(404);
+    }
+
+    @Test
+    void getHighestSalaryOfEmployees() throws IOException {
         givenGetAllEmployeesStubbedBehaviour();
         String body = when().get("/highestSalary")
                 .then()

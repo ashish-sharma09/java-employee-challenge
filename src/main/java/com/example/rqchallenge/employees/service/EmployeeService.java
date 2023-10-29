@@ -1,6 +1,8 @@
 package com.example.rqchallenge.employees.service;
 
 import com.example.rqchallenge.employees.model.Employee;
+import com.example.rqchallenge.employees.service.exception.EmployeeServiceException;
+import com.example.rqchallenge.employees.service.exception.EmployeeServiceNotFoundException;
 import com.example.rqchallenge.employees.service.model.EmployeeData;
 import com.example.rqchallenge.employees.service.model.ResponseForDelete;
 import com.example.rqchallenge.employees.service.model.ResponseForEmployee;
@@ -9,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -29,7 +33,7 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public List<Employee> getAllEmployees() {
-        var response = restTemplate.getForObject("/employees", ResponseForEmployees.class);
+        var response = getForObject("/employees", ResponseForEmployees.class);
         return response.getData().stream().map(employeeData ->
                 new Employee(
                         employeeData.getId(),
@@ -41,22 +45,9 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public Employee getEmployeeById(String id) {// TODO check for null or empty
-        var response = restTemplate.getForObject("/employee/" + id, ResponseForEmployee.class);
+    public Employee getEmployeeById(String id) {
+        var response = getForObject("/employee/" + id, ResponseForEmployee.class);
         return employeeFrom(response);
-    }
-
-    private Employee employeeFrom(ResponseForEmployee response) {
-        return new Employee(
-                response.getData().getId(),
-                response.getData().getName(),
-                parsedSalaryOf(response.getData()),
-                response.getData().getAge(),
-                response.getData().getImage());
-    }
-
-    private int parsedSalaryOf(EmployeeData employeeData) {
-        return Integer.parseInt(employeeData.getSalary());
     }
 
     @Override
@@ -79,5 +70,30 @@ public class EmployeeService implements IEmployeeService {
     public void deleteEmployee(String id) {
         ResponseEntity<ResponseForDelete> response =
                 restTemplate.exchange("/delete/" + id, HttpMethod.DELETE, null, ResponseForDelete.class);
+    }
+
+    private Employee employeeFrom(ResponseForEmployee response) {
+        return new Employee(
+                response.getData().getId(),
+                response.getData().getName(),
+                parsedSalaryOf(response.getData()),
+                response.getData().getAge(),
+                response.getData().getImage());
+    }
+
+    private <T> T getForObject(String url, Class<T> objectType) {
+        try {
+            return restTemplate.getForObject(url, objectType);
+        } catch(HttpClientErrorException exception) {
+            if (exception.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+                throw new EmployeeServiceNotFoundException();
+            } else {
+                throw new EmployeeServiceException();
+            }
+        }
+    }
+
+    private int parsedSalaryOf(EmployeeData employeeData) {
+        return Integer.parseInt(employeeData.getSalary());
     }
 }
