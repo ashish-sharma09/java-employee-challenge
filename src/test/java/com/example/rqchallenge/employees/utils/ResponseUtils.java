@@ -34,6 +34,21 @@ public interface ResponseUtils {
             "  }" +
             "}";
 
+    String CREATE_EMPLOYEE_BACKEND_RESPONSE_TEMPLATE = "{" +
+            "    \"status\": \"success\"," +
+            "    \"data\": {" +
+            "        \"name\": \"{name}\"," +
+            "        \"salary\": \"{salary}\"," +
+            "        \"age\": \"{age}\"," +
+            "        \"id\": 25" +
+            "    }" +
+            "}";
 
-
+    String CREATE_EMPLOYEE_RESPONSE_TEMPLATE = "{" +
+            "  \"id\": \"25\"," +
+            "  \"name\": \"{name}\"," +
+            "  \"salary\": {salary}," +
+            "  \"age\": \"{age}\"," +
+            "  \"image\": \"\"" +
+            "}";
 }

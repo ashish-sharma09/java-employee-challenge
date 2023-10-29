@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -22,11 +21,18 @@ import java.io.IOException;
 
 import static com.example.rqchallenge.employees.utils.ResourceTestUtils.contentOf;
 import static com.example.rqchallenge.employees.utils.ResourceTestUtils.resourcePath;
+import static com.example.rqchallenge.employees.utils.ResponseUtils.CREATE_EMPLOYEE_BACKEND_RESPONSE_TEMPLATE;
+import static com.example.rqchallenge.employees.utils.ResponseUtils.CREATE_EMPLOYEE_RESPONSE_TEMPLATE;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 @ExtendWith(SpringExtension.class) // TODO check if we need this
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -77,35 +83,35 @@ class RqChallengeApplicationTests {
         var expectedResponse = contentOf("expectedAllEmployees.json");
         var actualResponse = when().get("/").then().statusCode(200).extract().body().asPrettyString();
 
-        JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
+        assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
     }
 
     @Test
     void getEmployeeByNameSearchWithFirstNameToMatch() throws IOException, JSONException {
         givenGetAllEmployeesStubbedBehaviour();
         var actualResponse = when().get("/search/Tiger").then().statusCode(200).extract().body().asPrettyString();
-        JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
+        assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
     }
 
     @Test
     void getEmployeeByNameSearchWithMatchingPartialNameIgnoringCase() throws IOException, JSONException {
         givenGetAllEmployeesStubbedBehaviour();
         var actualResponse = when().get("/search/tiger").then().statusCode(200).extract().body().asPrettyString();
-        JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
+        assertEquals(ResponseUtils.NAME_SEARCH_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
     }
 
     @Test
     void getEmployeeByNameSearchMatchingMultipleEmployees() throws IOException, JSONException {
         givenGetAllEmployeesStubbedBehaviour();
         var actualResponse = when().get("/search/ixon").then().statusCode(200).extract().body().asPrettyString();
-        JSONAssert.assertEquals(ResponseUtils.NAME_SEARCH_MULTIPLE_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
+        assertEquals(ResponseUtils.NAME_SEARCH_MULTIPLE_EMPLOYEE_RESPONSE, actualResponse, JSONCompareMode.STRICT);
     }
 
     @Test
     void getEmployeeById() throws JSONException {
         stubDummyServiceBehaviourWith("/api/v1/employee/2", ResponseUtils.GET_EMPLOYEE_BY_ID_RESPONSE);
         var actualResponse = when().get("/2").then().statusCode(200).extract().body().asPrettyString();
-        JSONAssert.assertEquals(ResponseUtils.EMPLOYEE_2, actualResponse, JSONCompareMode.STRICT);
+        assertEquals(ResponseUtils.EMPLOYEE_2, actualResponse, JSONCompareMode.STRICT);
     }
 
     @Test
@@ -134,7 +140,47 @@ class RqChallengeApplicationTests {
                 .body()
                 .asPrettyString();
         var expectedResponse = contentOf("expectedAllEmployeesForTopTen.json");
-        JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
+        assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
+    }
+
+    @Test
+    void createEmployee() throws JSONException {
+        var name = "New Name";
+        var salary  = "112233";
+        var age = "23";
+
+        wireMockServer.stubFor(post(urlPathEqualTo("/api/v1/create"))
+                .withFormParam("name", equalTo(name))
+                .withFormParam("salary", equalTo(salary))
+                .withFormParam("age", equalTo(age))
+                .willReturn(aResponse().withBody(
+                        responseFromTemplate(CREATE_EMPLOYEE_BACKEND_RESPONSE_TEMPLATE, name, salary, age)))
+        );
+        var createRequest = "{" +
+                "\"name\":\"" + name + "\"," +
+                "\"salary\":\"" + salary + "\"," +
+                "\"age\":\"" + age + "\"" +
+                "}";
+        var actualResponse = given()
+                .request()
+                .body(createRequest)
+                .when()
+                .post("/")
+                .then()
+                .assertThat()
+                .statusCode(201)
+                .extract().body().asString();
+
+        var expectedResponse = responseFromTemplate(CREATE_EMPLOYEE_RESPONSE_TEMPLATE, name, salary, age);
+
+        assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
+    }
+
+    private String responseFromTemplate(String template, String name, String salary, String age) {
+        return template
+                .replace("{name}", name)
+                .replace("{salary}", salary)
+                .replace("{age}", age);
     }
 
     private void stubDummyServiceBehaviourWith(String url, String responseBody) {

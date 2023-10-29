@@ -22,7 +22,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
 
-
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation("io.rest-assured:rest-assured:${restVersion}") {
         exclude group: 'org.codehaus.groovy', module: 'groovy'
@@ -31,7 +30,7 @@ dependencies {
     testImplementation "io.rest-assured:json-path:${restVersion}"
     testImplementation "io.rest-assured:xml-path:${restVersion}"
 
-    testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8', version: '2.32.0'
+    testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: '3.0.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
