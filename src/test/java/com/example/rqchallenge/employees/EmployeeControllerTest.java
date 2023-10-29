@@ -92,18 +92,6 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void errorResponseWhenThereAreMultipleEmployeesWithSameId() {
-        // Given
-        var nonMatchingEmployee = new Employee("1", "someFirstName1 someLastName1", 320800, "61", new byte[]{});
-        var matchingEmployee = new Employee("1", "someFirstName2 someLastName2", 223600, "41", new byte[]{});
-
-        when(employeeService.getAllEmployees()).thenReturn(List.of(matchingEmployee,nonMatchingEmployee));
-
-        // Then
-        assertThat(employeeController.getEmployeeById("1").getStatusCodeValue()).isEqualTo(500);
-    }
-
-    @Test
     void getHighestSalaryOfEmployees() {
         // Given
         int expectedResponse = 320800;

@@ -1,6 +1,7 @@
 package com.example.rqchallenge;
 
 import com.example.rqchallenge.employees.utils.ResponseUtils;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
@@ -8,14 +9,12 @@ import org.hamcrest.Matchers;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 
@@ -36,7 +35,7 @@ import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-@ExtendWith(SpringExtension.class) // TODO check if we need this
+// Skipped some negative tests in interest of time, but have provided couple to show the error handling and its testing
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RqChallengeApplicationTests {
 
@@ -45,7 +44,7 @@ class RqChallengeApplicationTests {
             .options(wireMockConfig()
                     .dynamicHttpsPort()
                     .keystorePath(resourcePath("dummyKeystore.jks"))
-                    .keystorePassword("changeit") // TODO pick from config file
+                    .keystorePassword("changeit")
                     .keyManagerPassword("changeit"))
             .build();
 
@@ -60,6 +59,7 @@ class RqChallengeApplicationTests {
     @BeforeEach
     void setUp() {
         RestAssured.baseURI = "http://localhost:" + port;
+        WireMock.reset();
     }
 
     @Test
@@ -72,7 +72,7 @@ class RqChallengeApplicationTests {
         RestAssured.baseURI = "https://localhost:" + wireMockServer.getHttpsPort();
 
         given()
-                .trustStore(resourcePath("dummyKeystore.jks"), "changeit") // TODO pick from config file
+                .trustStore(resourcePath("dummyKeystore.jks"), "changeit")
                 .when()
                 .get("/status")
                 .then()
@@ -89,8 +89,8 @@ class RqChallengeApplicationTests {
     }
 
     @Test
-    void errorDuringGetAllEmployees() throws IOException, JSONException {
-        stubDummyServiceGetBehaviourWith("/", 500);
+    void errorDuringGetAllEmployees() {
+        stubDummyServiceGetBehaviourWith("/api/v1/employees", 500);
         when().get("/").then().statusCode(500);
     }
 

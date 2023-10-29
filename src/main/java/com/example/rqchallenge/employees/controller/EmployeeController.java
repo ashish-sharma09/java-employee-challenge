@@ -2,6 +2,7 @@ package com.example.rqchallenge.employees.controller;
 
 import com.example.rqchallenge.employees.model.Employee;
 import com.example.rqchallenge.employees.service.IEmployeeService;
+import com.example.rqchallenge.employees.service.exception.EmployeeServiceException;
 import com.example.rqchallenge.employees.service.exception.EmployeeServiceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +89,11 @@ public class EmployeeController implements IEmployeeController {
     @ExceptionHandler({EmployeeServiceNotFoundException.class})
     public ResponseEntity handleException() {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler({EmployeeServiceException.class})
+    public ResponseEntity handleAnyOtherDownstreamException() {
+        return ResponseEntity.internalServerError().build();
     }
 
     private Stream<Employee> sortedEmployeesBySalaryInDescendingOrder() {

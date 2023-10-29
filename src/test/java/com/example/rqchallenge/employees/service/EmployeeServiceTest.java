@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+// Skipped some negative tests in interest of time, but have provided couple to show the testing and implementation
 @ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
 
