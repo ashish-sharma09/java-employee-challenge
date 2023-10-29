@@ -2,12 +2,15 @@ package com.example.rqchallenge.employees.service;
 
 import com.example.rqchallenge.employees.model.Employee;
 import com.example.rqchallenge.employees.service.model.EmployeeData;
+import com.example.rqchallenge.employees.service.model.ResponseForDelete;
 import com.example.rqchallenge.employees.service.model.ResponseForEmployee;
 import com.example.rqchallenge.employees.service.model.ResponseForEmployees;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -70,5 +73,11 @@ public class EmployeeService implements IEmployeeService {
 
         var response = restTemplate.postForObject("/create", request, ResponseForEmployee.class);
         return employeeFrom(response); //TODO check for null
+    }
+
+    @Override
+    public void deleteEmployee(String id) {
+        ResponseEntity<ResponseForDelete> response =
+                restTemplate.exchange("/delete/" + id, HttpMethod.DELETE, null, ResponseForDelete.class);
     }
 }

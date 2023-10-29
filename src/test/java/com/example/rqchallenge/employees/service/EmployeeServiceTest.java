@@ -2,6 +2,7 @@ package com.example.rqchallenge.employees.service;
 
 import com.example.rqchallenge.employees.model.Employee;
 import com.example.rqchallenge.employees.service.model.EmployeeData;
+import com.example.rqchallenge.employees.service.model.ResponseForDelete;
 import com.example.rqchallenge.employees.service.model.ResponseForEmployee;
 import com.example.rqchallenge.employees.service.model.ResponseForEmployees;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +13,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -99,6 +102,17 @@ class EmployeeServiceTest {
 
         assertThat(employeeService.createEmployee(employeeData.getName(), employeeData.getSalary(), employeeData.getAge()))
                 .isEqualTo(expectedEmployee);
+    }
+
+    @Test
+    void deleteEmployee() {
+        var response = new ResponseForDelete();
+        response.setStatus("Success");
+        response.setMessage("successfully! deleted Record");
+        Mockito.when(restTemplate.exchange("/delete/25", HttpMethod.DELETE, null, ResponseForDelete.class)).thenReturn(ResponseEntity.ok(response));
+
+        employeeService.deleteEmployee("25");
+        Mockito.verify(restTemplate).exchange("/delete/25", HttpMethod.DELETE, null, ResponseForDelete.class);
     }
 
     private ResponseForEmployees getResponse() {

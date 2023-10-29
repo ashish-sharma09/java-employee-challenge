@@ -24,7 +24,9 @@ import static com.example.rqchallenge.employees.utils.ResourceTestUtils.contentO
 import static com.example.rqchallenge.employees.utils.ResourceTestUtils.resourcePath;
 import static com.example.rqchallenge.employees.utils.ResponseUtils.CREATE_EMPLOYEE_BACKEND_RESPONSE_TEMPLATE;
 import static com.example.rqchallenge.employees.utils.ResponseUtils.CREATE_EMPLOYEE_RESPONSE_TEMPLATE;
+import static com.example.rqchallenge.employees.utils.ResponseUtils.DELETE_EMPLOYEE_BACKEND_RESPONSE;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -65,7 +67,7 @@ class RqChallengeApplicationTests {
 
         String status = "{\"status\": \"success\"}";
 
-        stubDummyServiceBehaviourWith("/status", status);
+        stubDummyServiceGetBehaviourWith("/status", status);
 
         RestAssured.baseURI = "https://localhost:" + wireMockServer.getHttpsPort();
 
@@ -109,7 +111,7 @@ class RqChallengeApplicationTests {
 
     @Test
     void getEmployeeById() throws JSONException {
-        stubDummyServiceBehaviourWith("/api/v1/employee/2", ResponseUtils.GET_EMPLOYEE_BY_ID_RESPONSE);
+        stubDummyServiceGetBehaviourWith("/api/v1/employee/2", ResponseUtils.GET_EMPLOYEE_BY_ID_RESPONSE);
         var actualResponse = when().get("/2").then().statusCode(200).extract().body().asPrettyString();
         assertEquals(ResponseUtils.EMPLOYEE_2, actualResponse, JSONCompareMode.STRICT);
     }
@@ -130,7 +132,7 @@ class RqChallengeApplicationTests {
 
     @Test
     void getTop10HighestEarningEmployeeNames() throws IOException, JSONException {
-        stubDummyServiceBehaviourWith("/api/v1/employees", contentOf("allEmployeesForTopTenQuery.json"));
+        stubDummyServiceGetBehaviourWith("/api/v1/employees", contentOf("allEmployeesForTopTenQuery.json"));
         String actualResponse = when().get("/topTenHighestEarningEmployeeNames")
                 .then()
                 .assertThat()
@@ -164,6 +166,7 @@ class RqChallengeApplicationTests {
                 "\"salary\":\"" + salary + "\"," +
                 "\"age\":\"" + age + "\"" +
                 "}";
+
         var actualResponse = given()
                 .request()
                 .header(new Header("Content-Type", "application/json"))
@@ -180,6 +183,31 @@ class RqChallengeApplicationTests {
         assertEquals(expectedResponse, actualResponse, JSONCompareMode.STRICT);
     }
 
+    @Test
+    void deleteEmployee() throws JSONException {
+        // Given
+        String employeeId = "2";
+
+        stubDummyServiceGetBehaviourWith("/api/v1/employee/" + employeeId, ResponseUtils.GET_EMPLOYEE_BY_ID_RESPONSE);
+
+        wireMockServer.stubFor(delete(urlPathEqualTo("/api/v1/delete/" + employeeId))
+                .willReturn(aResponse()
+                        .withHeader("content-type", "application/json")
+                        .withBody(DELETE_EMPLOYEE_BACKEND_RESPONSE))
+        );
+
+        var actualResponse =
+                 when()
+                .delete("/" + employeeId)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract().body().asString();
+
+        assertThat(actualResponse).isEqualTo("Charles Dixon");
+    }
+
+
     private String responseFromTemplate(String template, String name, String salary, String age) {
         return template
                 .replace("{name}", name)
@@ -187,7 +215,7 @@ class RqChallengeApplicationTests {
                 .replace("{age}", age);
     }
 
-    private void stubDummyServiceBehaviourWith(String url, String responseBody) {
+    private void stubDummyServiceGetBehaviourWith(String url, String responseBody) {
         wireMockServer.stubFor(
                 WireMock.get(url)
                         .willReturn(aResponse().withBody(responseBody).withHeader("content-type", "application/json"))
@@ -195,6 +223,6 @@ class RqChallengeApplicationTests {
     }
 
     private void givenGetAllEmployeesStubbedBehaviour() throws IOException {
-        stubDummyServiceBehaviourWith("/api/v1/employees", contentOf("allEmployeesFromDummyService.json"));
+        stubDummyServiceGetBehaviourWith("/api/v1/employees", contentOf("allEmployeesFromDummyService.json"));
     }
 }

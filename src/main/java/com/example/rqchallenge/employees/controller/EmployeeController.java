@@ -70,7 +70,9 @@ public class EmployeeController implements IEmployeeController {
 
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
-        return null;
+        Employee employee = employeeService.getEmployeeById(id);
+        employeeService.deleteEmployee(id);
+        return ResponseEntity.ok(employee.getName());
     }
 
     private Stream<Employee> sortedEmployeesBySalaryInDescendingOrder() {

@@ -50,4 +50,9 @@ public interface ResponseUtils {
             "  \"salary\": {salary}," +
             "  \"age\": \"{age}\"" +
             "}";
+
+    String DELETE_EMPLOYEE_BACKEND_RESPONSE = "{" +
+            "    \"status\": \"success\"," +
+            "    \"message\": \"successfully! deleted Record\"" +
+            "}";
 }

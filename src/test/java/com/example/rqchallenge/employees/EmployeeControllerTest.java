@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -189,5 +190,19 @@ class EmployeeControllerTest {
                 Map.of("name", name, "salary", salary, "age", age));
 
         assertThat(employee.getBody()).isEqualTo(createdEmployee);
+    }
+
+    @Test
+    void deleteEmployee() {
+        var empName = "name";
+        var empId = "25";
+
+        var employee = new Employee(empId, empName, 232543, "46", "".getBytes());
+        when(employeeService.getEmployeeById(empId)).thenReturn(employee);
+
+        var response = employeeController.deleteEmployeeById(empId);
+        assertThat(response.getBody()).isEqualTo(empName);
+
+        verify(employeeService).deleteEmployee(empId);
     }
 }
