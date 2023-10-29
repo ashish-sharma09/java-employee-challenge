@@ -10,6 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -29,7 +34,7 @@ class EmployeeServiceTest {
     void setUp() {
         employeeService = new EmployeeService(restTemplate);
     }
-    //TODO change url to include /api/v1
+
     @Test
     void getAllEmployees() {
         ResponseForEmployees response = getResponse();
@@ -63,6 +68,37 @@ class EmployeeServiceTest {
                                 employeeData.getImage());
 
         assertThat(employeeService.getEmployeeById("1")).isEqualTo(expectedEmployee);
+    }
+
+    @Test
+    void createEmployee() {
+        ResponseForEmployee response = new ResponseForEmployee();
+        EmployeeData employeeData = employee1Data();
+        employeeData.setId("25");
+        response.setData(employeeData);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        map.add("name", employeeData.getName());
+        map.add("salary", employeeData.getSalary());
+        map.add("age", employeeData.getAge());
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+        Mockito.when(restTemplate.postForObject("/create", request, ResponseForEmployee.class))
+                .thenReturn(response);
+
+        var expectedEmployee = new Employee(
+                                employeeData.getId(),
+                                employeeData.getName(),
+                                Integer.parseInt(employeeData.getSalary()),
+                                employeeData.getAge(),
+                                employeeData.getImage());
+
+        assertThat(employeeService.createEmployee(employeeData.getName(), employeeData.getSalary(), employeeData.getAge()))
+                .isEqualTo(expectedEmployee);
     }
 
     private ResponseForEmployees getResponse() {

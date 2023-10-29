@@ -4,6 +4,7 @@ import com.example.rqchallenge.employees.utils.ResponseUtils;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.restassured.RestAssured;
+import io.restassured.http.Header;
 import org.hamcrest.Matchers;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,6 @@ import static com.example.rqchallenge.employees.utils.ResponseUtils.CREATE_EMPLO
 import static com.example.rqchallenge.employees.utils.ResponseUtils.CREATE_EMPLOYEE_RESPONSE_TEMPLATE;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -153,8 +153,11 @@ class RqChallengeApplicationTests {
                 .withFormParam("name", equalTo(name))
                 .withFormParam("salary", equalTo(salary))
                 .withFormParam("age", equalTo(age))
-                .willReturn(aResponse().withBody(
-                        responseFromTemplate(CREATE_EMPLOYEE_BACKEND_RESPONSE_TEMPLATE, name, salary, age)))
+                .withHeader("content-type", equalTo("application/x-www-form-urlencoded;charset=UTF-8"))
+                .willReturn(aResponse()
+                        .withHeader("content-type", "application/json")
+                        .withBody(
+                                responseFromTemplate(CREATE_EMPLOYEE_BACKEND_RESPONSE_TEMPLATE, name, salary, age)))
         );
         var createRequest = "{" +
                 "\"name\":\"" + name + "\"," +
@@ -163,12 +166,13 @@ class RqChallengeApplicationTests {
                 "}";
         var actualResponse = given()
                 .request()
+                .header(new Header("Content-Type", "application/json"))
                 .body(createRequest)
                 .when()
                 .post("/")
                 .then()
                 .assertThat()
-                .statusCode(201)
+                .statusCode(200)
                 .extract().body().asString();
 
         var expectedResponse = responseFromTemplate(CREATE_EMPLOYEE_RESPONSE_TEMPLATE, name, salary, age);

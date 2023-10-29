@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -171,5 +173,21 @@ class EmployeeControllerTest {
         var expectedResponse = List.of("Employee8","Employee5","Employee4","Employee3","Employee2", "Employee1");
 
         assertThat(employeeController.getTopTenHighestEarningEmployeeNames().getBody()).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    void createEmployee() {
+        var name = "someName";
+        var salary = 112344;
+        var age = "someAge";
+
+        var createdEmployee = new Employee("25", name, salary, age, "".getBytes());
+        when(employeeService.createEmployee(name, Integer.toString(salary), age))
+                .thenReturn(createdEmployee);
+
+        ResponseEntity<Employee> employee = employeeController.createEmployee(
+                Map.of("name", name, "salary", salary, "age", age));
+
+        assertThat(employee.getBody()).isEqualTo(createdEmployee);
     }
 }

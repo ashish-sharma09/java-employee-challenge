@@ -37,9 +37,9 @@ public interface ResponseUtils {
     String CREATE_EMPLOYEE_BACKEND_RESPONSE_TEMPLATE = "{" +
             "    \"status\": \"success\"," +
             "    \"data\": {" +
-            "        \"name\": \"{name}\"," +
-            "        \"salary\": \"{salary}\"," +
-            "        \"age\": \"{age}\"," +
+            "        \"employee_name\": \"{name}\"," +
+            "        \"employee_salary\": \"{salary}\"," +
+            "        \"employee_age\": \"{age}\"," +
             "        \"id\": 25" +
             "    }" +
             "}";
@@ -48,7 +48,6 @@ public interface ResponseUtils {
             "  \"id\": \"25\"," +
             "  \"name\": \"{name}\"," +
             "  \"salary\": {salary}," +
-            "  \"age\": \"{age}\"," +
-            "  \"image\": \"\"" +
+            "  \"age\": \"{age}\"" +
             "}";
 }

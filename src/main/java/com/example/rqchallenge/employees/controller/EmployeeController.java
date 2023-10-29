@@ -61,7 +61,11 @@ public class EmployeeController implements IEmployeeController {
 
     @Override
     public ResponseEntity<Employee> createEmployee(Map<String, Object> employeeInput) {
-        return null;
+        return ResponseEntity.ok(employeeService.createEmployee(
+                    employeeInput.get("name").toString(),
+                    employeeInput.get("salary").toString(),
+                    employeeInput.get("age").toString()
+                ));
     }
 
     @Override
